@@ -1,12 +1,15 @@
 import React from "react";
 import css from "./ImageCard.module.css";
 
-const ImageCard = () => {
+const ImageCard = ({ src, alt }) => {
   return (
-    <div>
-      <img src="" alt="" />
-    </div>
-  );
-};
+      <div>
+          <img src={src} alt={alt} />
+      </div>
+  )
+}
 
 export default ImageCard;
+
+
+

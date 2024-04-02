@@ -1,35 +1,65 @@
-import React from "react";
-// import { useState, useEffect } from "react";
-// import axios from "axios";
+
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import SearchBar from "./components/SearchBar/SearchBar";
+import Loader from "./components/Loader/Loader";
+import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
+import ImageGallery from "./components/ImageGallery/ImageGallery";
+import { getPhotos } from "./service/api";
+import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
+
 
 const App = () => {
-  // const [articles, setArticles] = useState([]);
-  // const [loading, setLoading] = useState(false);
-  // const [error, setError] = useState(false);
+  const [photos, setPhotos] = useState(null);
+  const [query, setQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
-  // const handleSearch = async (topic) => {
-  //   try {
-  //     setArticles([]);
-  //     setError(false);
-  //     setLoading(true);
-  //     const data = await fetchArticlesWithTopic(topic);
-  //     setArticles(data);
-  //   } catch (error) {
-  //     setError(true);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  useEffect(() => {
+    if (!query) return;
+    async function handleSearch() {
+      try {
+        setLoading(true);
+        setError(false);
+        const data = await getPhotos(query, page);
+        if (Array.isArray(data)) {
+          setPhotos((prevPhotos) => [...prevPhotos, ...data]);
+          setTotalPages(data.total_pages);
+        } else {
+          setError(true);
+        }
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+      }
+    }
+    handleSearch();
+  }, [query, page]);
+
+  const handleQuery = (newQury) => {
+    setQuery(newQury);
+    setPhotos(null);
+    setPage(1);
+    setTotalPages(0);
+  };
+
+
+  const loadMorePhotos = () => {
+    setPage((totalPages) => totalPages + 1);
+  };
 
   return (
     <div>
-      <SearchBar />
-      {/* <SearchForm onSearch={handleSearch} />
+      <SearchBar onSubmit={handleQuery} />
+      {totalPages > page && ( <LoadMoreBtn loadMorePhotos={loadMorePhotos} /> )}
       {loading && <Loader />}
-      {error && <Error />}
-      {articles.length > 0 && <ArticleList items={articles} />} */}
+      {error && <ErrorMessage />}
+    
+      {photos && photos.length > 0 && ( <ImageGallery photos={photos} /> )}
+     
     </div>
   );
 };

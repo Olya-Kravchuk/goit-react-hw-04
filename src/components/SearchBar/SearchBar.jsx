@@ -1,34 +1,55 @@
-import React from "react";
+import React, { useState } from "react";
+import { FiSearch } from "react-icons/fi";
+// import { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast'
 import css from "./SearchBar.module.css";
 
-const SearchBar = (onSearch) => {
-  // const handleSubmit = (evt) => {
-  //   evt.preventDefault();
-  //   const form = evt.target;
-  //   const topic = form.elements.topic.value;
+const SearchBar = ({ onSubmit }) => {
+  const [value, setValue] = useState("");
 
-  //   if (form.elements.topic.value.trim() === "") {
-  //     alert("Please enter search term!");
-  //     return;
-  //   }
 
-  //   onSearch(topic);
-  //   form.reset();
-  // };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+  
+    const query = value.trim();
+    if (!query.length) {
+      toast.error('Please, enter your query', {
+        style: {
+          borderRadius: '8px',
+          background: 'linear-gradient(90deg, rgba(205,64,103,0.7826568859965861) 21%, rgba(41,0,255,1) 80%)',
+          color: '#fff',
+        },
+      });
+      return;
+    }
+    onSubmit(query);
+  };
+
+
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setValue(value);
+  };
 
   return (
     <header>
-      <form>
+      <form onSubmit={handleSubmit}>
         <input
           type="text"
-          autocomplete="off"
-          autofocus
+          value={value}
+          onChange={handleChange}
+          autoComplete="off"
+          autoFocus
           placeholder="Search images and photos"
         />
-        <button type="submit">Search</button>
+        <button type="submit">
+          <FiSearch size="16px" />
+        </button>
       </form>
+      <Toaster position="top-left" aria-label="Search"/>
     </header>
   );
 };
 
 export default SearchBar;
+
