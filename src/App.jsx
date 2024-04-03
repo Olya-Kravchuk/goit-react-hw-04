@@ -58,7 +58,7 @@ const App = () => {
       {loading && <Loader />}
       {error && <ErrorMessage />}
     
-      {photos && photos.length > 0 && ( <ImageGallery photos={photos} /> )}
+      {photos !== null && ( <ImageGallery photos={photos} /> )}
      
     </div>
   );
