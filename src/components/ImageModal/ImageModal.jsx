@@ -1,12 +1,41 @@
-import css from './ImageModal.module.css'
+import React from 'react';
+import Modal from 'react-modal';
+import css from './ImageModal.module.css';
 
+const customStyles = {
+  content: {
+    padding: '0',
+    background: 'unset',
+    overflow: 'unset',
+    border: 'none',
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
 
-import React from 'react'
+export const ImageModal = ({ isOpen, photo, onRequestClose }) => {
+  if (!photo) {
+    return null;
+  }
 
-const ImageModal = () => {
   return (
-    <div>ImageModal</div>
-  )
-}
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      overlayClassName={css.overlay}
+      style={customStyles}
+    >
+      <button className={css.closeButton} onClick={onRequestClose}>x</button>
+        <img
+          src={photo.urls.regular}
+          alt={photo.alt_description}
+          className={css.imageModal}
+        />
 
-export default ImageModal
+    </Modal>
+  );
+};

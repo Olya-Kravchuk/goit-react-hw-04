@@ -32,7 +32,7 @@ const SearchBar = ({ onSubmit }) => {
   };
 
   return (
-    <header>
+    <header id="header">
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -42,7 +42,7 @@ const SearchBar = ({ onSubmit }) => {
           autoFocus
           placeholder="Search images and photos"
         />
-        <button type="submit">
+        <button className={css.searchBtn} type="submit" >
           <FiSearch size="16px" />
         </button>
       </form>

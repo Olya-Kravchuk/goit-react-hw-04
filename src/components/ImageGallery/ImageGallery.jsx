@@ -2,14 +2,15 @@ import React from "react";
 import ImageCard from "../ImageCard/ImageCard";
 import css from "./ImageGallery.module.css";
 
-const ImageGallery = ({ photos }) => {
+const ImageGallery = ({ photos, handleImageClick,  }) => {
   return (
     <ul>
       {Array.isArray(photos) &&
-      photos.map((photo) => {
+      photos.map((photo, index) => {
+        const isLastImage = index === photos.length - 1;
         return (
-          <li key={photo.id} >
-            <ImageCard src={photo.urls.small} alt={photo.alt_description} />
+          <li key={photo.id} /*ref={isLastImage ? lastImageRef : null}*/>
+            <ImageCard photo={photo} onClick={() => handleImageClick(photo)}/>
           </li>
         );
       })}

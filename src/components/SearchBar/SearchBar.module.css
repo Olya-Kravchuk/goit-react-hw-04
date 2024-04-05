@@ -2,7 +2,7 @@ header {
   background-color: #2b1dc3;
   width: 100%;
   margin-top: 0;
-  padding: 5px;
+  padding: 10px;
   box-sizing: border-box;
 }
 form {
@@ -10,9 +10,10 @@ form {
   display: inline-block;
 }
 input {
-  padding-left: 30px;
+  width: 250px;
+  padding: 5px 5px 5px 30px;
 }
-button {
+.searchBtn {
   position: absolute;
   top: 5px;
   left: 5px;

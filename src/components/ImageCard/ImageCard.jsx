@@ -1,10 +1,13 @@
 import React from "react";
 import css from "./ImageCard.module.css";
 
-const ImageCard = ({ src, alt }) => {
+const ImageCard = ({photo, onClick }) => {
+  const handleClick = () => {
+    onClick(photo);
+};
   return (
-      <div>
-          <img src={src} alt={alt} />
+      <div className={css.container}>
+          <img src={photo.urls.small} alt={photo.alt_description} onClick={handleClick}/>
       </div>
   )
 }

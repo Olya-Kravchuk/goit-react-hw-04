@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Loader from "./components/Loader/Loader";
@@ -7,7 +6,10 @@ import ErrorMessage from "./components/ErrorMessage/ErrorMessage";
 import ImageGallery from "./components/ImageGallery/ImageGallery";
 import { getPhotos } from "./service/api";
 import LoadMoreBtn from "./components/LoadMoreBtn/LoadMoreBtn";
-
+import { ImageModal } from "./components/ImageModal/ImageModal";
+import ScrollUp from "./components/ScrollUp/ScrollUp";
+import ScrollIntoView from 'react-scroll-into-view'
+import axios from 'axios';
 
 const App = () => {
   const [photos, setPhotos] = useState(null);
@@ -16,6 +18,22 @@ const App = () => {
   const [error, setError] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [scrollBtn, setScrollBtn] = useState(false);
+  // const lastImageRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.innerWidth > 900) {
+        const isScrollBtnVisible = window.scrollY > 200;
+        setScrollBtn(isScrollBtnVisible);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     if (!query) return;
@@ -24,12 +42,14 @@ const App = () => {
         setLoading(true);
         setError(false);
         const data = await getPhotos(query, page);
-        if (Array.isArray(data)) {
-          setPhotos((prevPhotos) => [...prevPhotos, ...data]);
-          setTotalPages(data.total_pages);
-        } else {
-          setError(true);
-        }
+        setPhotos(prevPhotos => {
+          if (Array.isArray(prevPhotos)) {
+            return [...prevPhotos, ...data.results];
+          } else {
+            return [...data.results];
+          }
+        });
+        setTotalPages(data.total_pages);
       } catch (error) {
         setError(true);
       } finally {
@@ -37,29 +57,52 @@ const App = () => {
       }
     }
     handleSearch();
+    // scrollToLastImage();
   }, [query, page]);
 
-  const handleQuery = (newQury) => {
-    setQuery(newQury);
-    setPhotos(null);
-    setPage(1);
-    setTotalPages(0);
+  const handleQuery = (newQuery) => {
+    if (newQuery !== query) {
+      setQuery(newQuery);
+      setPhotos(null);
+      setPage(1);
+      setTotalPages(0);
+    }
   };
 
+  // const scrollToLastImage = () => {
+  //   if (lastImageRef.current) {
+  //     lastImageRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  //   }
+  // };
 
   const loadMorePhotos = () => {
-    setPage((totalPages) => totalPages + 1);
+    setPage(prevPage => prevPage + 1);
+    // setScrollBtn(true);
+  };
+
+  const openModal = photo => {
+    setSelectedPhoto(photo);
+  };
+
+  const closeModal = () => {
+    setSelectedPhoto(null);
+  };
+
+  const onScrollBtn = () => {
+    setScrollBtn(false)
   };
 
   return (
     <div>
       <SearchBar onSubmit={handleQuery} />
-      {totalPages > page && ( <LoadMoreBtn loadMorePhotos={loadMorePhotos} /> )}
       {loading && <Loader />}
       {error && <ErrorMessage />}
-    
-      {photos !== null && ( <ImageGallery photos={photos} /> )}
-     
+      {photos !== null && (
+        <ImageGallery photos={photos} handleImageClick={openModal} /*lastImageRef={lastImageRef}*/ />
+      )}
+      {totalPages > page && <LoadMoreBtn loadMorePhotos={loadMorePhotos} />}
+      <ImageModal isOpen={!!selectedPhoto} photo={selectedPhoto} onRequestClose={closeModal} />
+      {scrollBtn && <ScrollIntoView selector="#header"><ScrollUp onScrollBtn={onScrollBtn} /></ScrollIntoView>}
     </div>
   );
 };
